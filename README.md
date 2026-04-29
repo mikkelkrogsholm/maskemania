@@ -2,251 +2,163 @@
 
 # maskemania
 
-Open source-generator til validerede strikke- og hækleopskrifter på
-dansk og engelsk. AI er tekstforfatter, Python er regnemaskinen,
-mennesket er prøvestrikkeren.
+Skriv dine mål, dit garn, og din maskeprøve — få en strikke- eller hækleopskrift
+hvor tallene går op, layoutet er print-klar, og garnet aldrig løber tør tre rækker
+før toppen. På dansk eller engelsk. Helt gratis.
 
-LLM'er kan ikke holde hundredevis af maskeantal i hovedet konsistent.
-Eksperimenter som SkyKnit har demonstreret det. Dette repo omgår
-problemet ved at lade Python lave matematikken og validere at hver
-række/omgang balancerer (`consumed sts == sts_before`), så vi ender med
-en opskrift der faktisk hænger sammen — uanset om det er en hue, en
-top-down raglan, et corner-to-corner-tæppe eller en stranded yoke.
+## Hvad er det?
 
-## Quick start
+Maskemania er en lille værktøjskasse til strikkere og hæklere der gerne vil
+designe deres egen opskrift uden at skulle vente på at nogen anden laver den
+først. Du fortæller den hvor stor en hue skal være, hvad din maskeprøve viser,
+og hvilket garn du har liggende — og så regner den ud hvor mange masker du
+skal slå op, hvor mange omgange ribkant der er naturligt, hvornår indtagningerne
+skal sætte ind, og hvornår du trækker tråden gennem de sidste masker.
 
-Krav: Python 3.10+. Ingen pip-pakker.
+Lige nu kan den lave 20 forskellige konstruktioner: huer, tørklæder, sweatre,
+sokker, sjaler, granny squares, corner-to-corner-tæpper, amigurumi-kaniner,
+mandalaer, og en del mere. Hver opskrift kommer med materialeliste, schematic,
+forkortelses-tabel og — hvis du gider — et lille forord til opskriften.
+
+## Hvorfor er den værd at prøve?
+
+ChatGPT og Claude kan ikke regne. De kan godt skrive en opskrift der **lyder**
+overbevisende, men maskeantallene er typisk lidt skæve — ribkanten ender på
+et ulige tal, indtagningerne går ikke op, du mangler 7 masker når du når
+toppen. Maskemania bruger AI til selve teksten omkring opskriften, men al
+matematikken kommer fra Python-kode der dobbelttjekker hver eneste række og
+omgang. Hvis tallene ikke går op, kommer opskriften ikke ud af maskinen.
+Du får simpelthen ikke en opskrift med fejl.
+
+## Sådan kommer du i gang
+
+Maskemania kører i et terminalvindue. På Mac er det allerede installeret;
+på Windows kan du bruge Windows Terminal eller WSL.
 
 ```bash
+# 1) Hent koden
 git clone https://github.com/mikkelkrogsholm/maskemania.git
 cd maskemania
 
-# En hue (markdown til terminalen)
+# 2) En hue, hovedomkreds 56 cm, gauge 22 m / 30 p på 10 cm, Drops Air
 python3 skills/strikning/scripts/generate.py --format md hue \
-  --head 56 --sts 22 --rows 30 --yarn "Drops Air"
+  --head 56 --sts 22 --rows 30 --garn "Drops Air"
 
-# En amigurumi-kugle med Drops Air (gauge auto-fyldes fra yarn-DB)
-python3 skills/hækling/scripts/generate.py --format md amigurumi \
-  --diameter 8 --yarn "Drops Air"
-
-# En raglan-sweater som PDF (Chrome headless)
-python3 skills/strikning/scripts/generate.py --pdf raglan.pdf raglan \
-  --bust 94 --sts 22 --rows 30 --ease 5 --sleeve-length 45
-
-# En social-media preview (1080×1080 PNG)
-python3 skills/strikning/scripts/generate.py --social square \
-  --out hue.png hue --head 56 --sts 22 --rows 30
+# 3) En granny-firkant på 6 omgange
+python3 skills/hækling/scripts/generate.py --format md granny --rounds 6
 ```
 
-`--format` understøtter `md`, `json`, `html`. `--lang en` skifter cover,
-materialer og forkortelser til engelsk (step-teksten i opskriften
-forbliver dansk indtil videre).
+Vil du have opskriften som print-klar PDF? Tilføj `--pdf hue.pdf` til
+kommandoen. (Det kræver [WeasyPrint](https://weasyprint.org/) installeret:
+`pip install weasyprint`.)
 
-### PDF-eksport
+### De flag du oftest skal bruge
 
-PDF-output bruger som standard [WeasyPrint](https://weasyprint.org/) —
-en Python-native HTML→PDF-renderer med native CSS Paged Media-support
-og ingen Chromium-afhængighed. Installér med:
+| Det du vil sige | Flag |
+|---|---|
+| Hovedomkreds | `--head 56` |
+| Brystmål | `--bust 94` |
+| Bredde og længde i cm | `--width 30 --length 180` |
+| Maskeprøve: masker pr. 10 cm | `--sts 22` |
+| Maskeprøve: pinde pr. 10 cm | `--rows 30` |
+| Garn (auto-fylder gauge fra databasen) | `--garn "Drops Air"` |
+| Børnestørrelse | `--age 6-12M` (eller `0-3M`, `1-2y`, `4-6y` …) |
+| Skift til engelsk | `--lang en` |
+| Foreslå garn-alternativer | `--substitut` |
 
-```bash
-pip install weasyprint
-```
+Hvis du foretrækker danske flag-navne, virker `--bryst`, `--bredde`,
+`--længde`, `--hovedmål`, `--fodlængde`, `--ærme` osv. også.
 
-Hvis WeasyPrint ikke er installeret, falder vi automatisk tilbage til
-headless Chrome / Chromium / Edge / Brave (og giver en klar fejl hvis
-ingen af delene findes). Tving en specifik renderer med
-`--pdf-renderer {auto,weasy,chrome}`. Default er `auto`.
+## Hvad kan den lave?
 
-### Flag-konvention
+### Strikning
 
-Tekniske inputs (mål, gauge) bruger **engelsk kebab-case som primær**
-(`--head`, `--bust`, `--neck`, `--width`, `--length`, `--height`,
-`--foot-length`, `--shoe-size`, `--sleeve-length`, `--upper-arm`,
-`--row-gauge`, `--yoke-depth`, …). Hvert teknisk flag har en dansk
-alias (`--hovedmål`, `--bryst`, `--hals`, `--bredde`, `--længde`,
-`--højde`, `--fodlængde`, `--skostørrelse`, `--ærme`, `--overarm`,
-`--række-gauge`, `--yokedybde`, …).
-
-Materialer bruger **dansk som primær** fordi de er kunde-vendte
-(`--garn`, `--garnløbe`, `--pinde`, `--nål`, `--år`, `--note`), men
-accepterer engelske aliases (`--yarn`, `--yarn-run`/`--meterage`,
-`--needles`, `--hook`, `--year`, `--notes`).
-
-Begge varianter virker uden modifikationer i alle eksisterende scripts.
-
-## Konstruktioner
-
-20 konstruktioner i alt. Sværhedsgrad følger `Pattern.difficulty` i
-koden.
-
-### Strikning (11)
-
-| Navn | CLI-subcommand | Sværhedsgrad |
+| Hvad | Sværhedsgrad | Subcommand |
 |---|---|---|
-| Hue | `hue` | beginner |
-| Tørklæde | `tørklæde` | beginner |
-| Top-down raglan | `raglan` | easy |
-| Bottom-up sweater (Zimmermann EPS) | `sweater` | easy |
-| Sokker (top-down med hæl + gusset) | `sokker` | intermediate |
-| Compound raglan | `compound-raglan` | intermediate |
-| Half-pi shawl (Zimmermann) | `half-pi` | intermediate |
-| Short-rows crescent shawl | `short-rows` | intermediate |
-| Lace shawl (feather-and-fan) | `lace` | intermediate |
-| Colorwork-prøvelap | `colorwork` | easy |
-| Stranded yoke (Icelandic-style) | `yoke-stranded` | advanced |
+| Hue | Begynder | `hue` |
+| Tørklæde | Begynder | `tørklæde` |
+| Top-down raglan-sweater | Let øvet | `raglan` |
+| Bottom-up sweater | Let øvet | `sweater` |
+| Sokker (top-down med hæl + gusset) | Øvet | `sokker` |
+| Compound raglan | Øvet | `compound-raglan` |
+| Half-pi sjal (Zimmermann) | Øvet | `half-pi` |
+| Crescent-sjal med korte rækker | Øvet | `short-rows` |
+| Lace-sjal (feather and fan) | Øvet | `lace` |
+| Stranded yoke (islandsk stil) | Avanceret | `yoke-stranded` |
+| Colorwork-prøvelap | Let øvet | `colorwork` |
 
-### Hækling (9)
+### Hækling
 
-| Navn | CLI-subcommand | Sværhedsgrad |
+| Hvad | Sværhedsgrad | Subcommand |
 |---|---|---|
-| Amigurumi-kugle | `amigurumi` | beginner |
-| Amigurumi-cylinder | `cylinder` | beginner |
-| Amigurumi-figur (bjørn / kanin) | `figur` | easy |
-| Granny square | `granny` | beginner |
-| Hæklet tørklæde | `tørklæde` | beginner |
-| Filet (pixel-pattern) | `filet` | easy |
-| C2C-blanket (corner-to-corner) | `c2c` | easy |
-| Mandala | `mandala` | intermediate |
-| Tunisian (TSS) | `tunisian` | intermediate |
+| Amigurumi-kugle | Begynder | `amigurumi` |
+| Amigurumi-cylinder | Begynder | `cylinder` |
+| Amigurumi-figur (bjørn eller kanin) | Let øvet | `figur` |
+| Granny square | Begynder | `granny` |
+| Hæklet tørklæde | Begynder | `tørklæde` |
+| Filet (pixel-mønster) | Let øvet | `filet` |
+| C2C-tæppe (corner to corner) | Let øvet | `c2c` |
+| Mandala | Øvet | `mandala` |
+| Tunisian (TSS) | Øvet | `tunisian` |
 
-## Features
+## Praktiske finesser
 
-- **Pattern-validator.** Hver række/omgang valideres via `RowValidator`
-  (`consumed sts == sts_before`). Sektioner kan validere kontinuitet
-  via `Pattern.validate_continuity()`. Geometriske afvigelser > 3 cm
-  fra mål logges som warnings.
-- **Dansk og engelsk.** `--lang da|en` skifter cover, materialer,
-  schematics-captions, forkortelser og last-page. Step-tekst i selve
-  opskriften er stadig dansk-først.
-- **Garn-database.** 22 records (Drops, Sandnes, Önling, Hobbii,
-  Cascade, Rowan) med fuzzy lookup. `--garn "Drops Air"` auto-fylder
-  gauge, pind/hæklenål, garnløb. Fiber-baseret substitut-forslag via
-  `--substitut`.
-- **Børnesizing.** `CHILD_SIZES` for 9 alders-bånd (`0-3M` til
-  `10-12y`). `--age 6-12M` auto-fylder hovedomkreds, brystmål,
-  fodlængde, ærmelængde.
-- **Lace- og colorwork-charts.** Ren-Python SVG-symboler (knit, purl,
-  k2tog, ssk, yo, cdd, k3tog, sl1, no-stitch) + 5 stranded-motiver
-  (`stars`, `diagonal`, `simple_dots`, `snowflake_band`,
-  `icelandic_rose_band`). Ingen tredjeparts-fonts.
-- **Prosa-intro.** Per-konstruktion fragment-bibliotek på dansk og
-  engelsk, deterministisk seedet fra opskriftens metadata. Slå fra
-  med `--no-prosa`.
-- **Social-media preview.** `--social square` (1080×1080) eller
-  `--social story` (1080×1920) genererer en PNG via Chrome headless.
-  HTML-fallback hvis Chrome mangler.
-- **Direkte PDF-eksport.** `--pdf out.pdf` finder Chrome cross-platform
-  og kører `--headless --print-to-pdf`.
-- **Strikkeklub-batch.** `scripts/strikkeklub.py CSV --out DIR`
-  genererer en HTML-opskrift pr. medlem + index + zip.
-- **Pages-site.** `scripts/build_examples.py --out _site` bygger 10
-  eksempler + index. Deployes via `.github/workflows/pages.yml`.
-- **CI.** `.github/workflows/ci.yml` kører begge test-suites + 4 CLI
-  smoke-tests på pull request og push til main.
+**Garn-database.** 22 garn fra Drops, Sandnes, Önling, Hobbii, Cascade og
+Rowan er allerede sat ind med deres typiske gauge, pinde-/hæklenål-størrelse
+og garnløb. Skriver du `--garn "Drops Air"`, fyldes resten automatisk ud,
+så du kun behøver angive dine egne mål.
 
-## Tests
+**Børnestørrelser.** `--age 6-12M` (eller `0-3M`, `1-2y`, `2-4y` op til
+`10-12y`) auto-fylder hovedomkreds, brystmål og fodlængde efter de typiske
+nordiske strikketabeller.
 
-```bash
-# Strik (126 tests)
-python3 -m unittest discover -s skills/strikning/tests
+**Garn-alternativer.** Tilføj `--substitut`, og opskriften kommer med en
+boks med 3-5 alternative garn i samme tykkelse — dejligt når dit yndlingsgarn
+ikke længere produceres, eller du vil bruge noget du har på lager.
 
-# Hækl (98 tests)
-python3 -m unittest discover -s skills/hækling/tests
+**Strikkeklub-mode.** Skal du designe individuelle opskrifter til en hel
+strikkeklub? Saml jeres mål i et regneark, eksportér som CSV, og kør
+`python3 scripts/strikkeklub.py jer.csv --out klub2026`. Du får en mappe
+med en personlig PDF til hver person plus et oversigts-index.
 
-# Delt lib (33 tests)
-python3 -m unittest discover -s lib/visualisering/tests
-```
+**Sociale forhåndsvisninger.** `--social square hue.png` laver et 1080×1080
+billede du kan dele på Instagram. `--social story` laver 9:16-formatet til
+Stories og TikTok.
 
-Total: 257 tests. Alle skal være grønne før merge. CI håndhæver det.
+**Dansk og engelsk.** Skift sprog med `--lang en`. Hele opskriften oversættes
+— også selve trin-for-trin-instruktionerne.
 
-## Mappestruktur
+## En note om livet før test-strikning
 
-```
-maskemania/
-├── lib/
-│   └── visualisering/      # delt Python-pakke
-│       ├── pattern.py      # Pattern, Section, Step
-│       ├── bookkeeping.py  # Row, RowValidator, Stitch
-│       ├── shaping.py      # Bresenham, evenly_spaced
-│       ├── gauge.py        # cm <-> sts/rows + rounding
-│       ├── sizing.py       # CHILD_SIZES + helpers
-│       ├── svg.py          # schematics + helpers
-│       ├── html.py         # pluggable domain renderers
-│       ├── pdf.py          # Chrome headless wrapper
-│       ├── preview.py      # live HTTP-server
-│       ├── prosa.py        # template-baseret intro
-│       ├── social.py       # 1:1 / 9:16 preview
-│       ├── chart_symbols.py# lace + colorwork charts
-│       ├── motifs/         # stranded-motiv-bibliotek
-│       ├── yarn_db.py      # 22-garn database
-│       ├── yarn_alternatives.py
-│       ├── lang/           # da/en translations
-│       ├── assets/         # style.css, paged.polyfill.js, social.css
-│       ├── components/     # HTML-fragments
-│       ├── templates/      # outer shells (pattern.html, social_card.html)
-│       └── tests/          # 33 tests
-├── skills/
-│   ├── strikning/
-│   │   ├── SKILL.md
-│   │   ├── knitlib/
-│   │   │   ├── stitches.py
-│   │   │   ├── knitrow.py
-│   │   │   ├── ease.py
-│   │   │   ├── sizing.py   # re-eksport af shared sizing
-│   │   │   └── constructions/  # 11 konstruktioner
-│   │   ├── reference/      # forkortelser_da/en, sizing_guide, ease_guide
-│   │   ├── scripts/        # generate.py, preview.py
-│   │   ├── tests/          # 126 tests
-│   │   └── assets/logo.svg
-│   └── hækling/
-│       ├── SKILL.md
-│       ├── croclib/
-│       │   ├── stitches.py
-│       │   ├── crorow.py
-│       │   ├── svg.py
-│       │   ├── html.py
-│       │   ├── sizing.py
-│       │   └── constructions/  # 9 konstruktioner
-│       ├── scripts/
-│       ├── tests/          # 98 tests
-│       └── assets/logo.svg
-├── scripts/
-│   ├── build_examples.py   # bygger _site/ til Pages
-│   └── strikkeklub.py      # CSV -> batch af opskrifter
-├── examples/
-│   └── strikkeklub_eksempel.csv
-├── PLAN.md                 # vision + roadmap
-├── PLAN-research/          # iterations-rapporter
-├── README.md
-├── LICENSE
-├── CONTRIBUTING.md
-└── CHANGELOG.md
-```
+Alle 20 konstruktioner er matematisk validerede — alle masker går op. Men
+ingen af dem er endnu prøvestrikket eller prøvehæklet i den virkelige verden.
+Hvis du strikker eller hækler en af dem og oplever at den færdige ting afviger
+mere end 2-3 cm fra hvad opskriften lover, så fortæl os det —
+[åbn et issue](https://github.com/mikkelkrogsholm/maskemania/issues) med
+billede og mål, og vi retter generatoren. Test-strikkere og test-hæklere er
+den mest værdifulde form for bidrag, og vi tager imod jer med kyshånd.
+
+## Krav
+
+- Python 3.10 eller nyere (følger med Mac; gratis download til Windows fra
+  python.org).
+- En terminal. Mac: Terminal.app eller iTerm2. Windows: Windows Terminal
+  eller WSL.
+- Valgfrit: `pip install weasyprint` for direkte PDF-eksport.
+
+Ingen pip-pakker krævet for selve opskrifts-genereringen — det hele kører
+på Python's standardbibliotek.
 
 ## Bidrage
 
-Læs [`CONTRIBUTING.md`](CONTRIBUTING.md). Vigtigste regel:
+Vil du tilføje en ny konstruktion, et nyt garn til databasen, eller hjælpe med
+at finpudse de danske og engelske templates? Læs
+[`CONTRIBUTING.md`](CONTRIBUTING.md). Den vigtigste regel er enkel:
 
-> AI digter aldrig maskeantal. Al matematik kommer fra `lib/visualisering`,
-> `knitlib` eller `croclib` — eller direkte fra brugeren.
-
-Tilføjelse af en ny konstruktion følger en checkliste (Stitch-validering
-→ Construction-modul → CLI-subcommand → tests → translations →
-difficulty → CHANGELOG-hint). Test-strikning og test-hækling er den
-mest værdifulde form for bidrag — generatoren fanger matematiske fejl,
-ikke om en opskrift er behagelig at strikke.
+> AI digter aldrig maskeantal. Al matematik kommer fra Python — eller direkte
+> fra dig.
 
 ## Licens
 
-MIT. Se [`LICENSE`](LICENSE).
-
-## Status
-
-Pre-1.0. Versionsnumrene afspejler iterationer i `PLAN.md`, ikke
-semver-promiser om bagudkompatibilitet. Alle 20 konstruktioner er
-matematisk validerede gennem `RowValidator`, men ingen er endnu
-test-strikket eller test-hæklet i den virkelige verden — det er Fase
-4 i planen og afhænger af eksterne bidragsydere. Hvis du strikker eller
-hækler en af opskrifterne og finder en afvigelse på mere end 2 cm fra
-spec, så åbn et issue. Vi tager imod test-strikkere og test-hæklere med
-kyshånd.
+MIT — du må bruge, ændre og dele frit, også kommercielt. Se
+[`LICENSE`](LICENSE).
