@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/logo.svg" alt="maskemania" width="540"></p>
+<p align="center"><img src="assets/logo.png" alt="maskemania" width="720"></p>
 
 # maskemania
 
