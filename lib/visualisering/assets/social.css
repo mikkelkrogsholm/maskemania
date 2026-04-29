@@ -1,0 +1,189 @@
+/* Social-media preview cards.
+ *
+ * Two formats share the bulk of the rules; per-format tweaks live under
+ * .format-square (1080×1080, Instagram feed) and .format-story
+ * (1080×1920, Story / TikTok). The viewport is exact-pixel — no responsive
+ * resizing — because Chrome screenshots at the window-size we pass.
+ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #f4ede0;
+  color: #1f1d18;
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.format-square { width: 1080px; height: 1080px; }
+body.format-story  { width: 1080px; height: 1920px; }
+
+.card {
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 80% 10%, #fff8e2 0%, transparent 50%),
+    radial-gradient(circle at 10% 90%, #ffe4c4 0%, transparent 55%),
+    linear-gradient(180deg, #fbf3df 0%, #f0e5cf 100%);
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  padding: 60px 70px;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative knit-thematic accent — diagonal wool-thread strips. */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 14px;
+  background: repeating-linear-gradient(
+    90deg,
+    #c9a13a 0 16px,
+    #b38e2c 16px 32px
+  );
+  border-radius: 7px;
+  transform: rotate(-22deg);
+  opacity: 0.85;
+}
+.card::before { top: 30px; right: -40px; }
+.card::after  { bottom: 30px; left: -40px; transform: rotate(-22deg); }
+
+/* ---- top row ---- */
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b5710;
+  font-weight: 600;
+}
+.handle {
+  background: #1f1d18;
+  color: #fbf3df;
+  padding: 8px 18px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  font-weight: 500;
+}
+
+/* ---- hero ---- */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.photo-placeholder {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: #1f1d18;
+  color: #fbf3df;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 36px;
+  box-shadow: 0 20px 50px rgba(31,29,24,0.18);
+}
+body.format-square .photo-placeholder { width: 240px; height: 240px; margin-bottom: 24px; }
+body.format-story  .photo-placeholder { width: 380px; height: 380px; margin-bottom: 50px; }
+.photo-placeholder svg { width: 70%; height: 70%; }
+
+.title {
+  font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 96px;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0 0 16px;
+  color: #1f1d18;
+}
+body.format-square .title { font-size: 80px; }
+body.format-story  .title { font-size: 120px; }
+
+.subtitle {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 32px;
+  margin: 0;
+  color: #4a4434;
+  max-width: 24ch;
+}
+body.format-story .subtitle { font-size: 38px; }
+
+/* ---- meta ---- */
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.badges {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.badge {
+  background: #1f1d18;
+  color: #fbf3df;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+.badge.difficulty { background: #c9a13a; color: #1f1d18; font-weight: 600; }
+.badge strong { font-weight: 800; }
+
+.stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 28px;
+  font-size: 26px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+}
+body.format-story .stats { font-size: 30px; gap: 18px 36px; }
+.stats li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stats .stat-label {
+  font-size: 0.65em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b5710;
+  font-weight: 600;
+}
+.stats .stat-value {
+  font-weight: 700;
+  color: #1f1d18;
+}
+
+/* ---- bottom row ---- */
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  color: #4a4434;
+  font-weight: 500;
+}
+.footer-text { letter-spacing: 0.04em; }
+.footer-designer { font-style: italic; }

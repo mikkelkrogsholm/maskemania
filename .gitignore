@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build artefacts (GitHub Pages output)
+_site/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Claude Code session state
+.claude/scheduled_tasks.lock

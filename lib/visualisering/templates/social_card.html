@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="{{HTML_LANG}}">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=EB+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>{{INLINE_CSS}}</style>
+</head>
+<body class="format-{{FORMAT}}">
+<main class="card">
+  <header class="card-top">
+    <span class="eyebrow">{{EYEBROW}}</span>
+    <span class="handle">{{HANDLE}}</span>
+  </header>
+  <section class="hero">
+    <div class="photo-placeholder" aria-hidden="true">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M52 100 q12 -28 48 -28 t48 28" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M52 110 q12 28 48 28 t48 -28" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M68 100 l64 0" stroke="currentColor" stroke-width="2" stroke-dasharray="4 6" />
+      </svg>
+    </div>
+    <h1 class="title">{{NAME}}</h1>
+    <p class="subtitle">{{SUBTITLE}}</p>
+  </section>
+  <section class="meta">
+    <div class="badges">
+      <span class="badge difficulty">{{DIFFICULTY_LABEL}}: <strong>{{DIFFICULTY_VALUE}}</strong></span>
+      {{YARN_BADGE}}
+    </div>
+    <ul class="stats">
+      {{STATS_HTML}}
+    </ul>
+  </section>
+  <footer class="card-bottom">
+    <span class="footer-text">{{FOOTER}}</span>
+    <span class="footer-designer">{{DESIGNER}}</span>
+  </footer>
+</main>
+</body>
+</html>
