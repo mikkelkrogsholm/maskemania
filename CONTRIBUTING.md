@@ -53,8 +53,8 @@ python3 -m unittest discover -s skills/hækling/tests
 python3 -m unittest discover -s lib/visualisering/tests
 ```
 
-Total: 257 tests. Alle skal være grønne før merge. CI kører dem på hver
-pull request via `.github/workflows/ci.yml`.
+Total: 257 tests. Alle skal være grønne før merge — kør dem lokalt før
+du sender pull request.
 
 For røg-test af CLI'erne:
 
@@ -71,8 +71,8 @@ Hvis du vil teste `--pdf`-output: installer WeasyPrint
 (`pip install weasyprint`) — det er den anbefalede primære renderer.
 Alternativt skal du have en headless-capable browser installeret
 (Chrome, Chromium, Edge eller Brave); vi falder automatisk tilbage til
-den hvis WeasyPrint mangler. CI'en kører tests via mocks, så ingen af
-delene er nødvendige bare for at køre testsuiten.
+den hvis WeasyPrint mangler. Test-suiten bruger mocks, så ingen af
+delene er nødvendige bare for at køre testsene.
 
 ## Sådan tilføjer du en ny konstruktion
 

@@ -7,6 +7,10 @@ projektet er endnu pre-1.0 og versions-numrene afspejler iterationer i
 
 ## [Unreleased]
 
+### Removed
+- GitHub Actions workflows (`ci.yml` og `pages.yml`). Tests køres lokalt
+  før commit; ingen automatiseret CI/CD-pipeline længere.
+
 ### Added
 - **Engelsk i18n for konstruktions-step-tekst.** Alle 20 generator-funktioner
   (`generate_X(spec, lang="da")`) tager nu en `lang`-parameter. Når CLI'en
